@@ -5,7 +5,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test"
+    "test": "react-scripts test",
+    "serve": "serve -s build"
   },
   "proxy": "http://localhost:5000",
   "dependencies": {
@@ -23,7 +24,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^6.4.2",
     "@testing-library/react": "^16.0.0",
-    "@testing-library/user-event": "^14.5.2"
+    "@testing-library/user-event": "^14.5.2",
+    "serve": "^14.2.3"
   },
   "browserslist": {
     "production": [
