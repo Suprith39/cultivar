@@ -25,20 +25,21 @@ async function getBatchById(batchId) {
 
 async function createBatch({
   batch_id, product_name, origin, harvest_date, quantity, unit, farmer_id, qr_code,
-  farm_photo, crop_photo, verification_video, farm_lat, farm_lng, photo_taken_at
+  farm_photo, crop_photo, verification_video, farm_captured_at, crop_captured_at, liveness_verified
 }) {
-  const is_verified = !!(farm_photo && crop_photo && farm_lat && farm_lng);
+  const is_verified = !!(farm_photo && crop_photo && liveness_verified);
 
   const result = await db.query(
     `INSERT INTO batches
       (batch_id, product_name, origin, harvest_date, quantity, unit, farmer_id, status, qr_code,
-       farm_photo, crop_photo, verification_video, farm_lat, farm_lng, photo_taken_at, is_verified)
+       farm_photo, crop_photo, verification_video, farm_captured_at, crop_captured_at, liveness_verified, is_verified)
      VALUES ($1,$2,$3,$4,$5,$6,$7,'harvested',$8,$9,$10,$11,$12,$13,$14,$15)
      RETURNING *`,
     [
       batch_id, product_name, origin, harvest_date, quantity, unit, farmer_id, qr_code,
       farm_photo || null, crop_photo || null, verification_video || null,
-      farm_lat || null, farm_lng || null, photo_taken_at || null, is_verified
+      farm_captured_at || null, crop_captured_at || null,
+      liveness_verified || false, is_verified
     ]
   );
   return result.rows[0];
@@ -60,4 +61,17 @@ async function getNextBatchNumber(farmerId) {
   return parseInt(result.rows[0].count, 10) + 1;
 }
 
-module.exports = { getBatchesByFarmer, getBatchById, createBatch, updateBatchStatus, getNextBatchNumber };
+async function getPublicBatch(batchId) {
+  const result = await db.query(
+    `SELECT b.batch_id, b.product_name, b.origin, b.harvest_date, b.quantity, b.unit,
+            b.status, b.is_verified, b.farm_photo, b.crop_photo, b.farm_lat, b.farm_lng,
+            b.photo_taken_at, b.created_at, b.farmer_id, u.name as farmer_name
+     FROM batches b
+     JOIN users u ON b.farmer_id = u.id
+     WHERE b.batch_id = $1`,
+    [batchId]
+  );
+  return result.rows[0] || null;
+}
+
+module.exports = { getBatchesByFarmer, getBatchById, getPublicBatch, createBatch, updateBatchStatus, getNextBatchNumber };

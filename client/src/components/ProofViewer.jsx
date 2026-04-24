@@ -42,20 +42,22 @@ export default function ProofViewer({ batch, onClose }) {
         )}
 
         <div className="bg-gray-50 rounded p-3 text-sm space-y-2 mb-4">
-          {mapsUrl ? (
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">📍 GPS Location</span>
-              <a href={mapsUrl} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs">
-                {parseFloat(batch.farm_lat).toFixed(5)}, {parseFloat(batch.farm_lng).toFixed(5)} ↗
-              </a>
-            </div>
-          ) : (
-            <p className="text-gray-500">📍 No GPS data</p>
-          )}
-          {batch.photo_taken_at && (
+          {batch.liveness_verified && (
             <div className="flex justify-between">
-              <span className="text-gray-600">🕐 Photo Taken</span>
-              <span>{new Date(batch.photo_taken_at).toLocaleString()}</span>
+              <span className="text-gray-600">🎤 Liveness Check</span>
+              <span className="text-green-600 font-medium">Verified ✅</span>
+            </div>
+          )}
+          {batch.farm_captured_at && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">🕐 Farm Photo Taken</span>
+              <span>{new Date(batch.farm_captured_at).toLocaleString()}</span>
+            </div>
+          )}
+          {batch.crop_captured_at && (
+            <div className="flex justify-between">
+              <span className="text-gray-600">🕐 Crop Photo Taken</span>
+              <span>{new Date(batch.crop_captured_at).toLocaleString()}</span>
             </div>
           )}
         </div>

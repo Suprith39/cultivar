@@ -21,7 +21,10 @@ export default function LoginPage() {
     try {
       const res = await api.post('/auth/login', form);
       const user = login(res.data.token);
-      navigate(user.role === 'farmer' ? '/farmer/dashboard' : '/manufacturer/dashboard');
+      if (user.role === 'farmer') navigate('/farmer/dashboard');
+      else if (user.role === 'manufacturer') navigate('/manufacturer/dashboard');
+      else if (user.role === 'logistics_agent') navigate('/logistics/dashboard');
+      else navigate('/consumer/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed.');
     } finally {

@@ -14,8 +14,8 @@ async function register(req, res) {
   const { name, email, password, role } = req.body;
   if (!name || !email || !password || !role)
     return res.status(400).json({ message: 'All fields are required.' });
-  if (!['farmer', 'manufacturer'].includes(role))
-    return res.status(400).json({ message: 'Role must be farmer or manufacturer.' });
+  if (!['farmer', 'manufacturer', 'consumer', 'logistics_agent'].includes(role))
+    return res.status(400).json({ message: 'Invalid role.' });
 
   try {
     const existing = await User.findByEmail(email);

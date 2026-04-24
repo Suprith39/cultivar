@@ -10,6 +10,9 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/batches', require('./routes/batches'));
+app.use('/api/verify', require('./routes/verify'));
+app.use('/api/logistics', require('./routes/logistics'));
+app.use('/api/ratings', require('./routes/ratings'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

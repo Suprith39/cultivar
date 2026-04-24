@@ -5,9 +5,11 @@ import { useAuth } from '../context/AuthContext';
 import HarvestEntryForm from '../components/HarvestEntryForm';
 import QRModal from '../components/QRModal';
 import ProofViewer from '../components/ProofViewer';
+import FarmerRatingCard from '../components/FarmerRatingCard';
 
 export default function FarmerDashboard() {
   const { user, logout } = useAuth();
+  const [ratingData, setRatingData] = useState(null);
   const navigate = useNavigate();
   const [batches, setBatches] = useState([]);
   const [showForm, setShowForm] = useState(false);
@@ -28,6 +30,14 @@ export default function FarmerDashboard() {
 
   useEffect(() => { fetchBatches(); }, [fetchBatches]);
 
+  useEffect(() => {
+    if (user?.id) {
+      api.get(`/ratings/farmer/${user.id}`)
+        .then(r => setRatingData(r.data))
+        .catch(() => {});
+    }
+  }, [user]);
+
   function handleFormSuccess() {
     setShowForm(false);
     fetchBatches();
@@ -44,7 +54,12 @@ export default function FarmerDashboard() {
       <nav className="bg-white shadow px-6 py-4 flex justify-between items-center">
         <h1 className="text-xl font-bold text-green-700">Agri Tracker</h1>
         <div className="flex items-center gap-4">
-          <span className="text-gray-600 text-sm">Welcome, {user?.name}</span>
+          <span className="text-gray-600 text-sm">
+            Welcome, {user?.name}
+            {ratingData?.total > 0 && (
+              <span className="ml-2 text-yellow-500">⭐ {ratingData.average.toFixed(1)}</span>
+            )}
+          </span>
           <button onClick={() => { logout(); navigate('/login'); }} className="text-sm text-red-500 hover:underline">
             Logout
           </button>
@@ -131,6 +146,19 @@ export default function FarmerDashboard() {
       )}
       {selectedProof && (
         <ProofViewer batch={selectedProof} onClose={() => setSelectedProof(null)} />
+      )}
+
+      {/* My Ratings Section */}
+      {ratingData && (
+        <div className="max-w-6xl mx-auto px-4 pb-8">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">
+            My Ratings
+            {ratingData.total > 0 && (
+              <span className="ml-2 text-yellow-500 text-base font-normal">⭐ {ratingData.average.toFixed(1)} ({ratingData.total} review{ratingData.total !== 1 ? 's' : ''})</span>
+            )}
+          </h2>
+          <FarmerRatingCard data={ratingData} />
+        </div>
       )}
     </div>
   );

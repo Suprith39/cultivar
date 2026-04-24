@@ -21,7 +21,10 @@ export default function RegisterPage() {
     try {
       const res = await api.post('/auth/register', form);
       const user = login(res.data.token);
-      navigate(user.role === 'farmer' ? '/farmer/dashboard' : '/manufacturer/dashboard');
+      if (user.role === 'farmer') navigate('/farmer/dashboard');
+      else if (user.role === 'manufacturer') navigate('/manufacturer/dashboard');
+      else if (user.role === 'logistics_agent') navigate('/logistics/dashboard');
+      else navigate('/consumer/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed.');
     } finally {
@@ -77,6 +80,8 @@ export default function RegisterPage() {
             >
               <option value="farmer">Farmer</option>
               <option value="manufacturer">Manufacturer</option>
+              <option value="consumer">Consumer</option>
+              <option value="logistics_agent">Logistics Agent</option>
             </select>
           </div>
           <button
