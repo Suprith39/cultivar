@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../api/axios';
 import CaptureProof from './CaptureProof';
+import { useAuth } from '../context/AuthContext';
+import { demoBatches } from '../demo/demoData';
 
 export default function HarvestEntryForm({ onSuccess }) {
-  const [step, setStep] = useState('capture'); // 'capture' | 'form'
+  const { isDemo } = useAuth();
+  const [step, setStep] = useState('capture');
   const [proof, setProof] = useState(null);
   const [form, setForm] = useState({
     batch_id: '',
@@ -18,10 +21,14 @@ export default function HarvestEntryForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (isDemo) {
+      setForm(f => ({ ...f, batch_id: `BATCH-00${demoBatches.length + 1}` }));
+      return;
+    }
     api.get('/batches/next-id')
       .then(res => setForm(f => ({ ...f, batch_id: res.data.batchId })))
       .catch(() => {});
-  }, []);
+  }, [isDemo]);
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -37,6 +44,17 @@ export default function HarvestEntryForm({ onSuccess }) {
     setError('');
     setSuccess('');
     setLoading(true);
+
+    if (isDemo) {
+      // In demo mode, just simulate success locally
+      setTimeout(() => {
+        setSuccess('Batch registered successfully!');
+        setTimeout(() => onSuccess({ ...form, ...proof, id: Date.now(), status: 'harvested', is_verified: true, farmer_name: 'Ravi Kumar' }), 1000);
+      }, 500);
+      setLoading(false);
+      return;
+    }
+
     try {
       await api.post('/batches', { ...form, ...proof });
       setSuccess('Batch created successfully!');

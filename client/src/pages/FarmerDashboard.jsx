@@ -45,9 +45,13 @@ export default function FarmerDashboard() {
     }
   }, [user]);
 
-  function handleFormSuccess() {
+  function handleFormSuccess(newBatch) {
     setShowForm(false);
-    fetchBatches();
+    if (isDemo && newBatch) {
+      setBatches(prev => [newBatch, ...prev]);
+    } else {
+      fetchBatches();
+    }
   }
 
   const statusColors = {
