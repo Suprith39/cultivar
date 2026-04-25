@@ -3,3 +3,5 @@ builder = "nixpacks"
 
 [deploy]
 startCommand = "node index.js"
+healthcheckPath = "/"
+healthcheckTimeout = 300
