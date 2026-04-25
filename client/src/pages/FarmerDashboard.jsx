@@ -6,9 +6,10 @@ import HarvestEntryForm from '../components/HarvestEntryForm';
 import QRModal from '../components/QRModal';
 import ProofViewer from '../components/ProofViewer';
 import FarmerRatingCard from '../components/FarmerRatingCard';
+import { demoBatches, demoFarmer } from '../demo/demoData';
 
 export default function FarmerDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, isDemo } = useAuth();
   const [ratingData, setRatingData] = useState(null);
   const navigate = useNavigate();
   const [batches, setBatches] = useState([]);
@@ -18,6 +19,12 @@ export default function FarmerDashboard() {
   const [selectedProof, setSelectedProof] = useState(null);
 
   const fetchBatches = useCallback(async () => {
+    if (isDemo) {
+      setBatches([...demoBatches]);
+      setLoading(false);
+      setRatingData({ average: demoFarmer.rating, total: demoFarmer.totalReviews, distribution: { 5: 15, 4: 7, 3: 2, 2: 0, 1: 0 }, reviews: [] });
+      return;
+    }
     try {
       const res = await api.get('/batches');
       setBatches(res.data);
@@ -26,7 +33,7 @@ export default function FarmerDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isDemo]);
 
   useEffect(() => { fetchBatches(); }, [fetchBatches]);
 
